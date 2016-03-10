@@ -12,7 +12,13 @@ app.use(express.static(__dirname + '/public'));
 app.set('port', process.env.port || 3000)
 
 app.get('/', function(req, res){
-    res.render('home');
+    res.set('Content-Type', 'text/plain');
+    var s = '';
+    for(var name in req.headers){
+        s += name + ': ' + req.headers[name] + '\n';
+    }
+    // res.render('home');
+    res.send(s);
 });
 
 app.get('/about', function(req, res){
