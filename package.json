@@ -22,7 +22,10 @@
   },
   "homepage": "https://github.com/twolun/node-and-express#readme",
   "dependencies": {
+    "body-parser": "^1.15.0",
     "ejs": "^2.4.1",
-    "express": "^4.13.4"
+    "express": "^4.13.4",
+    "formidable": "^1.0.17",
+    "jquery-file-upload-middleware": "^0.1.7"
   }
 }
