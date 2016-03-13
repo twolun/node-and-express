@@ -1,6 +1,12 @@
+var bodyParser = require('body-parser');
+var formidable = require('formidable');
 var express = require('express');
 
+
 var app = express();
+
+//body-parser中间件，处理POST表单请求
+app.use(bodyParser());
 
 // app.set('view engine', 'ejs');
 app.engine('html', require('ejs').renderFile);
@@ -23,7 +29,52 @@ app.get('/', function(req, res){
 
 app.get('/about', function(req, res){
     res.render('about');
-})
+});
+
+
+app.get('/newsletter', function(req, res){
+    res.render('newsletter', {csrf: 'CSRF token goes here '});
+});
+//注册成功，重定向的页面
+app.get('/thank-you', function(req, res){
+   console.log('thank-you', req.query);
+   res.render('thank-you', {name: req.query.name, email: req.query.email}); 
+});
+
+//文件 上传测试
+app.get('/contest/vacation-photo', function(req, res){
+   var now = new Date();
+   res.render('contest/vacation-photo', {
+       year: now.getFullYear(), month: now.getMonth()
+   }); 
+});
+
+//处理表单提交的post请求
+app.post('/process', function(req, res){
+    console.log(req.xhr, req.accepts('json, html'));
+    if(req.xhr || req.accepts('json, html') === 'json'){
+        res.send({success: true});
+    }else{
+        res.redirect(303, '/thank-you?name=' + req.body.name + '&email=' + req.body.email);
+        
+    }
+});
+
+//处理文件上传测试表单
+app.post('/contest/vacation-photo/:year/:month', function(req, res){
+   var form = new formidable.IncomingForm();
+   form.parse(req, function(err, fields, files){
+      if(err){
+          return res.redirect(303, '/error');
+      } 
+      console.log('received fields: ');
+      console.log(fields);
+      console.log('received files: ');
+      console.log(files);
+      res.redirect(303, '/thank-you');
+   }); 
+});
+
 
 
 app.use(function(req, res) {
