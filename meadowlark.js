@@ -1,12 +1,17 @@
 var bodyParser = require('body-parser');
 var formidable = require('formidable');
+var cookieParser = require('cookie-parser');
 var express = require('express');
+
+var credentials = require('./credentials.js');
 
 
 var app = express();
 
 //body-parser中间件，处理POST表单请求
 app.use(bodyParser());
+//使用cookie
+app.use(cookieParser(credentials.cookieSecret));
 
 // app.set('view engine', 'ejs');
 app.engine('html', require('ejs').renderFile);
@@ -18,6 +23,10 @@ app.use(express.static(__dirname + '/public'));
 app.set('port', process.env.port || 3000)
 
 app.get('/', function(req, res){
+    //设置cookie测试
+    res.cookie('monster', 'nom nom');
+    res.cookie('singed_monster', 'nom nom', {signed: true});
+    
     res.set('Content-Type', 'text/plain');
     var s = '';
     for(var name in req.headers){
@@ -71,7 +80,7 @@ app.post('/contest/vacation-photo/:year/:month', function(req, res){
       console.log(fields);
       console.log('received files: ');
       console.log(files);
-      res.redirect(303, '/thank-you');
+      res.redirect(303, '/thank-you?name=' + req.body.name + '&email=' + req.body.email);
    }); 
 });
 
