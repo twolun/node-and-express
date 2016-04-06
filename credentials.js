@@ -1,3 +1,7 @@
 module.exports = {
-    cookieSecret: 'twolun'
+    cookieSecret: 'twolun',
+    gmail: {
+        user: 'vvvvtao@gmail.com',
+        password: 'nanbao5127'
+    }
 };

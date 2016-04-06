@@ -2,11 +2,25 @@ var bodyParser = require('body-parser');
 var formidable = require('formidable');
 var cookieParser = require('cookie-parser');
 var express = require('express');
+var nodemailer = require('nodemailer');
 
 var credentials = require('./credentials.js');
-
-
 var app = express();
+
+switch(app.get('env')){
+    case 'development':
+        //彩色的开发日志
+        app.use(require('morgan')('dev'));
+        break;
+    case 'production':
+        app.use(require('express-logger')({
+            path: __dirname + '/log/requests.log'
+        }))
+        break;
+}
+
+
+
 
 //body-parser中间件，处理POST表单请求
 app.use(bodyParser());
@@ -69,6 +83,16 @@ app.post('/process', function(req, res){
     }
 });
 
+//处理数据存储
+var dataDir = __dirname + '/data';
+var vacationPhotoDir =dataDir + '/vacation-photo';
+fs.existsSync(dataDir) || fs.mkdirSync(dataDir);
+fs.existsSync(vacationPhotoDir) || fs.mkdirSync(vacationPhotoDir);
+
+function saveContestEntry(contestName, email, year, month, photoPath){
+    //稍后做个事情 
+    
+}
 //处理文件上传测试表单
 app.post('/contest/vacation-photo/:year/:month', function(req, res){
    var form = new formidable.IncomingForm();
@@ -97,6 +121,28 @@ app.use(function(err, req, res, next){
    res.render('500');
 });
 
+//邮件实例
+// var mailTransport = nodemailer.createTransport('SMTP', {
+//     service: 'Gmail',
+//     auth: {
+//         user: credentials.gmail.user,
+//         pass: credentials.gmail.password
+//     }
+// });
+// var transporter = nodemailer.createTransport('smtps://vvvvtao%40gmail.com:nanbao5127@smtp.gmail.com');
+// //发送邮件
+// transporter.sendMail({
+//     from: '"Meadowlark Travel" <info@meadowlarktravel.com>',
+//     to: 'twolun@qq.com',
+//     subject: 'Your Meadowlark Travel Tour',
+//     text: 'Thank you fro bokking your trip with Meadowlark Travel.' + 'We look forward to your visit!'
+// }, function(err, info){
+//     if(err){
+//         return console.error('Unable to send email: ' + err);
+//     }
+//     console.log('Message sent: ' + info.response)
+// })
+
 app.listen(app.get('port'), function(){
-    console.log('Express started on http://localhost:' + app.get('port') + '; press Ctrl-C to terminate.');
+    console.log('Express started in ' + app.get('env') +' Express started on http://localhost:' + app.get('port') + '; press Ctrl-C to terminate.');
 })
